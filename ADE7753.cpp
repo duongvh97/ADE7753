@@ -79,27 +79,61 @@ long ADE7753::getPERIOD(int N) {
 uint8_t ADE7753::getVersion() {
   return read8bits_s(DIEREV);
 }
+
 /* Convert data get from register of ADE7753 to real value */
-// Convert to Hz datasheet page 19
+
 float ADE7753::getFrequency() {
-  mCurrentReg = getPERIOD(5);
-  return (447323215 / mCurrentReg) / 1000.0;
+  return 447323215 / getPERIOD(5) / 1000.0;
 }
 
-float ADE7753::getVoltage() {
+void ADE7753::getVoltage() {
   write16(MODE, 0x8C);
-  mVoltageReg = getVRMS(10);
-  return (mVoltageReg - 2800) * 0.0004592;
+  long temp = (getVRMS(10) * kV + offsetV) / 10000;
+  voltageReal = TransfomerRatio * temp / 1000.0;
 }
 
-float ADE7753::getCurrent() {
+void ADE7753::getCurrent() {
   write16(MODE, 0x8C);
-  mCurrentReg = getIRMS(10);
-  return ((float)(mCurrentReg - 1230) / 125500);
+  long temp = (getIRMS(10) * kI + offsetI) / 10000;
+  currentReal = (float)(CurrentRatio * temp / 1000.0);
 }
 
-float ADE7753::getPower() {
-  return ((float)getVoltage() * getCurrent());
+void ADE7753::getPower() {
+  getVoltage();
+  getCurrent();
+  PPowerReal = voltageReal * currentReal * getPF();
+}
+
+float ADE7753::getPF() {
+  long P_Reg = read24bits(LAENERGY);
+  long S_Reg = read24bits(LVAENERGY);
+  getResetInterruptStatus();
+  PF = 0.827 * P_Reg  / S_Reg;
+  if(PF > 1.0) PF = 1;
+  return PF;
+}
+
+float ADE7753::calculateWh() {
+  getPower();
+  Wh = (float)(Wh * (PPowerReal * (millis() - millisKwh) / 3600000.0));
+  millisKwh = millis();
+  return Wh;
+}
+
+void ADE7753::calibVoltage(long kv, long offset, float ratio) {
+  kV = kv;
+  offsetV = offset;
+  TransfomerRatio = ratio;
+}
+
+void ADE7753::calibCurrent(long ki, long offset, float ratio) {
+  kI = ki;
+  offsetI = offset;
+  CurrentRatio = ratio;
+}
+
+void ADE7753::setWh(float _wh) {
+  Wh = _wh;
 }
 
 /* SPI COMUNICATION */

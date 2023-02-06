@@ -6,8 +6,6 @@
 class RtcDs1307
 {
 private:
-    uint32_t epochTime;
-    DateTime m_dateTime;
     RTC_DS1307 m_rtc;
 public:
     static RtcDs1307* getInstance()
@@ -16,6 +14,7 @@ public:
         return &obj;
     }
     void initRTC();
+    void getCurrentTime(int &h, int &m, int &s);
 };
 
 #endif

@@ -52,12 +52,17 @@ public:
   long getInterruptStatus();
   long getResetInterruptStatus();
   uint8_t getVersion();
+  void calibVoltage(long kv, long offset, float ratio);
+  void calibCurrent(long ki, long offset, float ratio);
 
   float getFrequency();
-  float getVoltage();
-  float getCurrent();
-  float getPower();
-
+  void getVoltage();
+  void getCurrent();
+  void getPower();
+  float calculateWh();
+  float getPF();
+  void setWh(float _wh);
+  
   unsigned char read8bits(char reg);
   signed char read8bits_s(char reg);
   unsigned int read16bits(char reg);
@@ -72,11 +77,12 @@ public:
   void write24(char reg, unsigned long data);
 
 private:
-  long mPeriodReg;
-  long mVoltageReg;
-  long mCurrentReg;
-  long mPPowerReg, mSPowerReg, mQPowerReg;
-  float P_power_dec, Q_power_dec, S_power_dec, FP_dec; 
+  long kV, offsetV, TransfomerRatio, voltageReal;
+  long kI, offsetI, CurrentRatio, currentReal;
+  unsigned long millisKwh;
+  long PPowerReal;
+  float PF; 
+  float Wh;
 };
 
 

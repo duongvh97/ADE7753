@@ -26,3 +26,10 @@ void RtcDs1307::initRTC()
         Serial.println("RTC is running!");
     }
 }
+
+void RtcDs1307::getCurrentTime(int &h, int &m, int &s) {
+  DateTime now = m_rtc.now();
+  h = now.hour();
+  m = now.minute();
+  s = now.second();
+}
