@@ -56,10 +56,10 @@ public:
   void calibCurrent(long ki, long offset, float ratio);
 
   float getFrequency();
-  void getVoltage();
-  void getCurrent();
-  void getPower();
-  float calculateWh();
+  float getVoltage();
+  float getCurrent();
+  float getPower();
+  float calculateWh(float &v, float &i, float &p);
   float getPF();
   void setWh(float _wh);
   

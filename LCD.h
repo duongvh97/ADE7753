@@ -16,8 +16,11 @@ public:
     return &obj;
   }
   void initLCD(LiquidCrystal_I2C* lcd);
-  void lcdPrint(const uint8_t row, const uint8_t col, const char* data);
-  void lcdPrint(const uint8_t row, const uint8_t col, const uint8_t data);
+  template<typename T> 
+  void lcdPrint(const uint8_t row, const uint8_t col, T data) {
+    mLCD->setCursor(col, row);
+    mLCD->print(data);
+  }
   void lcdClear();
 };
 

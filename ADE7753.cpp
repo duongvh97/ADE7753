@@ -86,22 +86,25 @@ float ADE7753::getFrequency() {
   return 447323215 / getPERIOD(5) / 1000.0;
 }
 
-void ADE7753::getVoltage() {
+float ADE7753::getVoltage() {
   write16(MODE, 0x8C);
   long temp = (getVRMS(10) * kV + offsetV) / 10000;
   voltageReal = TransfomerRatio * temp / 1000.0;
+  return voltageReal;
 }
 
-void ADE7753::getCurrent() {
+float ADE7753::getCurrent() {
   write16(MODE, 0x8C);
   long temp = (getIRMS(10) * kI + offsetI) / 10000;
   currentReal = (float)(CurrentRatio * temp / 1000.0);
+  return currentReal;
 }
 
-void ADE7753::getPower() {
+float ADE7753::getPower() {
   getVoltage();
   getCurrent();
   PPowerReal = voltageReal * currentReal * getPF();
+  return PPowerReal;
 }
 
 float ADE7753::getPF() {
@@ -113,8 +116,11 @@ float ADE7753::getPF() {
   return PF;
 }
 
-float ADE7753::calculateWh() {
+float ADE7753::calculateWh(float &v, float &i, float &p) {
   getPower();
+  v = voltageReal;
+  i = currentReal;
+  p = PPowerReal;
   Wh = (float)(Wh * (PPowerReal * (millis() - millisKwh) / 3600000.0));
   millisKwh = millis();
   return Wh;
