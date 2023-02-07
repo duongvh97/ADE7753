@@ -52,6 +52,8 @@ void setup() {
   Serial.begin(9600);
   /* Init peripheral */
   ADE->start(CS_PIN);
+  ADE->calibCurrent(1.23, 4.56, 7.89); //-> modify
+  ADE->calibVoltage(1.23, 4.56, 7.89);
   LCD->initLCD(&mLCD);
   EEPROM.begin(EEPROM_SIZE);
   /* Read data from eeprom */
